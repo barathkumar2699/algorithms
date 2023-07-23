@@ -134,6 +134,17 @@ public class UF {
         }
     }
 
+    private void Remove(int x)
+    {
+        union(x, x + 1);
+    }
+
+    private int SuccessorOf(int x)
+    {
+        return find(x + 1);
+    }
+
+
     /**
      * Reads an integer {@code n} and a sequence of pairs of integers
      * (between {@code 0} and {@code n-1}) from standard input, where each integer
@@ -177,8 +188,12 @@ public class UF {
         StdOut.println(uf.count() + " components");
         int i = (StdIn.readInt());
 
+        uf.Remove(2);
+        int successor = uf.SuccessorOf(2);
+
 
         System.out.println("max component::"+uf.getMaxCanonocalElement(i));
+        System.out.println("successor::"+successor);
     }
 
 
