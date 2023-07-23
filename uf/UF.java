@@ -1,9 +1,14 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class UF {
 
     private int[] parent;  // parent[i] = parent of i
     private byte[] rank;   // rank[i] = rank of subtree rooted at i (never more than 31)
     private int count;     // number of components
+
+    public int[] maxRoot;
 
     /**
      * Initializes an empty union-find data structure with
@@ -18,9 +23,11 @@ public class UF {
         count = n;
         parent = new int[n];
         rank = new byte[n];
+        maxRoot = new int[n];
         for (int i = 0; i < n; i++) {
             parent[i] = i;
             rank[i] = 0;
+            maxRoot[i] = i;
         }
     }
 
@@ -38,6 +45,35 @@ public class UF {
             p = parent[p];
         }
         return p;
+    }
+
+    public static int findMax(int x,int y)
+    {
+        if (x > y) return x;
+        return y;
+    }
+
+    private void findCananiccalElement(int p,int q)
+    {
+        maxRoot[p]=findMax(p,q);
+        maxRoot[q]=findMax(p,q);
+        while (p != parent[p]) {
+            maxRoot[p] = findMax(maxRoot[p],parent[p]);
+            maxRoot[p] = findMax(maxRoot[q],parent[p]);
+            maxRoot[parent[p]] = findMax(maxRoot[parent[p]],maxRoot[p]);
+            maxRoot[parent[p]] = findMax(maxRoot[parent[p]],maxRoot[q]);
+
+            p = parent[p];
+        }
+    }
+
+    private int getMaxCanonocalElement(int i)
+    {
+
+        while (i != maxRoot[i]) {
+            i = maxRoot[i];
+        }
+        return i;
     }
 
     /**
@@ -87,6 +123,7 @@ public class UF {
             rank[rootP]++;
         }
         count--;
+        findCananiccalElement(p,q);
     }
 
     // validate that p is a valid index
@@ -106,17 +143,44 @@ public class UF {
      *
      * @param args the command-line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
+        File file = new File("uf\\log.txt");
+        Scanner sc = new Scanner(file);
+
         int n = StdIn.readInt();
         UF uf = new UF(n);
-        while (!StdIn.isEmpty()) {
-            int p = StdIn.readInt();
-            int q = StdIn.readInt();
+
+        while (sc.hasNextLine())
+        {
+            String[] data = sc.nextLine().split(" ");
+            int p = Integer.parseInt(data[0]);
+            int q = Integer.parseInt(data[1]);
             if (uf.find(p) == uf.find(q)) continue;
             uf.union(p, q);
             StdOut.println(p + " " + q);
+
         }
+
+
+
+
+
+
+//        while (!StdIn.isEmpty()) {
+//            int p = StdIn.readInt();
+//            int q = StdIn.readInt();
+//
+//            if (uf.find(p) == uf.find(q)) continue;
+//            uf.union(p, q);
+//            StdOut.println(p + " " + q);
+//        }
         StdOut.println(uf.count() + " components");
+        int i = (StdIn.readInt());
+
+
+        System.out.println("max component::"+uf.getMaxCanonocalElement(i));
     }
+
+
 }
 
